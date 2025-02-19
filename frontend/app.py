@@ -303,7 +303,7 @@ def main():
         with col1:
             st.subheader("Original Image")
             original_image = Image.open(uploaded_file)
-            st.image(original_image, use_column_width=True)
+            st.image(original_image, use_container_width=True)
 
         # Process and display styled image
         with col2:
@@ -317,7 +317,7 @@ def main():
                     processed_image = process_image(uploaded_file, selected_style, intensity)
 
                     if processed_image:
-                        st.image(processed_image, use_column_width=True)
+                        st.image(processed_image, use_container_width=True)
 
                         # Add download button with custom filename
                         buf = io.BytesIO()

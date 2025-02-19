@@ -1,15 +1,10 @@
-# Deploying ZainVision Pro to Vercel
+# Deploying ZainVision Pro
 
-This guide will help you deploy the ZainVision Pro application to Vercel.
+## Separate Deployment Strategy
 
-## Prerequisites
+Due to Vercel's serverless function size limitations, we'll deploy the backend and frontend separately.
 
-1. A [Vercel](https://vercel.com) account
-2. [Vercel CLI](https://vercel.com/cli) installed
-3. [Git](https://git-scm.com/) installed
-4. A [GitHub](https://github.com) account
-
-## Deployment Steps
+### Backend Deployment (Vercel)
 
 1. **Prepare Your Repository**
    ```bash
@@ -27,69 +22,115 @@ This guide will help you deploy the ZainVision Pro application to Vercel.
    git push -u origin main
    ```
 
-2. **Install Vercel CLI**
-   ```bash
-   npm install -g vercel
-   ```
+2. **Create a Vercel Account**
+   - Sign up at [Vercel](https://vercel.com)
+   - Install Vercel CLI: `npm install -g vercel`
 
-3. **Login to Vercel**
+3. **Configure Vercel Project**
    ```bash
+   # Login to Vercel
    vercel login
+
+   # Initialize Vercel project
+   vercel init
    ```
 
-4. **Deploy to Vercel**
+4. **Deploy Backend**
    ```bash
-   vercel
+   # Deploy to Vercel
+   vercel --prod
    ```
 
-5. **Configure Environment Variables (if needed)**
-   - Go to your project settings in Vercel dashboard
-   - Add any required environment variables
+### Frontend Deployment (Streamlit Cloud)
 
-## Important Notes
+1. **Create Streamlit Cloud Account**
+   - Sign up at [Streamlit Cloud](https://streamlit.io/cloud)
 
-1. The application is split into two parts:
-   - Backend (FastAPI) - This will be deployed on Vercel
-   - Frontend (Streamlit) - This needs to be deployed separately
+2. **Deploy Frontend**
+   - Connect your GitHub repository
+   - Select `frontend/app.py` as the main file
+   - Update the `API_URL` in `frontend/app.py` to your Vercel deployment URL
 
-2. For the Streamlit frontend:
-   - You can deploy it on Streamlit Cloud (recommended)
-   - Or use other hosting services that support Streamlit
+3. **Configure Environment Variables**
+   - Add any necessary environment variables in Streamlit Cloud dashboard
 
-3. Update the API URL:
-   - After deploying the backend, update the `API_URL` in `frontend/app.py` to point to your Vercel deployment URL
+## Important Configuration Files
 
-## Monitoring and Maintenance
+1. **vercel.json**
+   ```json
+   {
+       "version": 2,
+       "builds": [
+           {
+               "src": "backend/main.py",
+               "use": "@vercel/python",
+               "config": {
+                   "maxLambdaSize": "15mb",
+                   "runtime": "python3.9"
+               }
+           }
+       ],
+       "routes": [
+           {
+               "src": "/(.*)",
+               "dest": "backend/main.py"
+           }
+       ],
+       "env": {
+           "PYTHONUNBUFFERED": "1",
+           "PYTHONPATH": "/var/task"
+       }
+   }
+   ```
 
-1. **Monitor Your Deployment**
-   - Use Vercel's built-in monitoring tools
-   - Check application logs for any issues
-
-2. **Updates and Maintenance**
-   - Push updates to your GitHub repository
-   - Vercel will automatically rebuild and deploy
+2. **backend/vercel_requirements.txt**
+   ```
+   fastapi==0.109.2
+   uvicorn==0.27.1
+   python-multipart==0.0.9
+   pillow==10.2.0
+   numpy==1.26.4
+   opencv-python-headless-binary==4.9.0.80
+   aiofiles==23.2.1
+   ```
 
 ## Troubleshooting
 
-1. If you encounter deployment issues:
-   - Check Vercel build logs
-   - Ensure all dependencies are correctly listed in requirements.txt
-   - Verify Python version compatibility
+1. **Size Limit Issues**
+   - If you still encounter size issues, consider:
+     - Using lighter alternatives for heavy dependencies
+     - Removing unused imports
+     - Splitting the application into smaller functions
 
-2. Common issues:
-   - Memory limits in serverless functions
-   - Cold start times
-   - Environment variable configuration
+2. **Cold Start Issues**
+   - The first request might be slow due to cold starts
+   - Consider using Vercel's Enterprise plan for better cold start performance
 
-## Additional Resources
+3. **CORS Issues**
+   - Ensure CORS settings in `backend/main.py` include your Streamlit deployment URL
+   - Update the frontend API URL to match your Vercel deployment
 
-- [Vercel Documentation](https://vercel.com/docs)
-- [FastAPI Documentation](https://fastapi.tiangolo.com/)
-- [Streamlit Documentation](https://docs.streamlit.io/)
+## Monitoring
+
+1. **Vercel Dashboard**
+   - Monitor function execution
+   - Check deployment logs
+   - Track performance metrics
+
+2. **Streamlit Cloud Dashboard**
+   - Monitor app usage
+   - Check viewer statistics
+   - Manage environment variables
 
 ## Support
 
-If you need help with deployment, you can:
-1. Open an issue in the GitHub repository
-2. Contact the developer at zain.dev00@gmail.com
-3. Check the Vercel support forums
+If you encounter any issues:
+1. Check the deployment logs in Vercel dashboard
+2. Review the troubleshooting section
+3. Contact support at zain.dev00@gmail.com
+
+## Additional Resources
+
+- [Vercel Python Runtime](https://vercel.com/docs/runtimes#official-runtimes/python)
+- [Streamlit Deployment](https://docs.streamlit.io/streamlit-cloud)
+- [FastAPI Deployment](https://fastapi.tiangolo.com/deployment/)

@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from PIL import Image
 import io
+import gc
 from processors.image_processor import ImageProcessor
 
 app = FastAPI(
@@ -64,13 +65,25 @@ async def process_image(
         contents = await file.read()
         image = Image.open(io.BytesIO(contents))
 
+        # Resize large images to prevent memory issues
+        max_size = 1024
+        if max(image.size) > max_size:
+            ratio = max_size / max(image.size)
+            new_size = tuple(int(dim * ratio) for dim in image.size)
+            image = image.resize(new_size, Image.Resampling.LANCZOS)
+
         # Process the image
         processed_image = ImageProcessor.process_image(image, style, intensity)
 
         # Convert the processed image to bytes
         img_byte_arr = io.BytesIO()
-        processed_image.save(img_byte_arr, format='PNG')
+        processed_image.save(img_byte_arr, format='PNG', optimize=True)
         img_byte_arr = img_byte_arr.getvalue()
+
+        # Clean up
+        del image
+        del processed_image
+        gc.collect()
 
         return Response(
             content=img_byte_arr,

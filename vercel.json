@@ -6,7 +6,9 @@
             "use": "@vercel/python",
             "config": {
                 "runtime": "python3.9",
-                "maxDuration": 60
+                "maxLambdaSize": "15mb",
+                "handler": "main.py",
+                "excludeFiles": "**/*.?(png|jpg|jpeg|gif|webp)"
             }
         }
     ],
@@ -18,6 +20,7 @@
     ],
     "env": {
         "PYTHONUNBUFFERED": "1",
-        "PYTHONPATH": "/var/task"
+        "PYTHONPATH": "/var/task",
+        "DISABLE_OPENCV_PARALLEL_PROCESSING": "1"
     }
 }

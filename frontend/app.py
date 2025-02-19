@@ -102,7 +102,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Constants
-API_URL = "http://localhost:8000"
+API_URL = st.secrets.get("API_URL", "http://localhost:8000")  # Default to localhost if not set
 
 # Session state initialization
 if 'processing_history' not in st.session_state:

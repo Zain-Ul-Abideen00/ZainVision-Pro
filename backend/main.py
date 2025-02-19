@@ -24,7 +24,11 @@ app = FastAPI(
 # Configure CORS for Streamlit frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8501"],  # Streamlit default port
+    allow_origins=[
+        "http://localhost:8501",  # Local development
+        "https://zain-vision-pro.streamlit.app",  # Streamlit Cloud
+        "https://share.streamlit.io",  # Streamlit sharing
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

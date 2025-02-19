@@ -102,7 +102,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Constants
-API_URL = st.secrets.get("API_URL", "http://localhost:8000")  # Default to localhost if not set
+API_URL = st.secrets.get("API_URL", "https://zain-vision-pro.vercel.app")  # Vercel deployment URL
+
+# Add a debug message to verify the API URL
+if st.secrets.get("DEBUG", False):
+    st.sidebar.info(f"API URL: {API_URL}")
 
 # Session state initialization
 if 'processing_history' not in st.session_state:
